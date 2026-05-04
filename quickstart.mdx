@@ -8,46 +8,35 @@ description: "Make your first CallHeater phone lookup."
 Use `GET /lookup` with a US phone number. Send your provided API key in the `X-API-Key` header.
 
 ```bash
-curl "https://api.callheater.com/lookup" \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "X-Phone: 4155550123" \
-  -H "X-Lookup-Mode: Basic" \
-  -H "X-Display: json" \
-  -H "X-Cache: true"
+curl "https://api.callheater.com/lookup?phone=4155550123&mode=Basic&display=json" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
-The default response is JSON. Set `X-Display: pretty` when you want a plain text response for humans.
+The default response is JSON. Set `display=pretty` when you want a plain text response for humans.
 
 ```bash
-curl "https://api.callheater.com/lookup" \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "X-Phone: 4155550123" \
-  -H "X-Display: pretty"
+curl "https://api.callheater.com/lookup?phone=4155550123&display=pretty" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ## Choose a Lookup Mode
 
-Use `X-Lookup-Mode: Basic` for standard caller context. Use `X-Lookup-Mode: DeepResearch` when deeper enrichment is available for the number.
+Use `mode=Basic` for standard caller context. Use `mode=DeepResearch` when deeper enrichment is available for the number.
 
 ```bash
-curl "https://api.callheater.com/lookup" \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "X-Phone: 4155550123" \
-  -H "X-Lookup-Mode: DeepResearch"
+curl "https://api.callheater.com/lookup?phone=4155550123&mode=DeepResearch" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ## Common Options
 
-Use these headers to control the lookup response:
+Use these query parameters to control the lookup response:
 
-- `X-Phone`: Required phone number to look up.
-- `X-Lookup-Mode`: `Basic` or `DeepResearch`.
-- `X-Display`: `json` or `pretty`.
-- `X-Cache`: Set to `false` to force a fresh lookup.
-- `X-RealEstate`: Set to `true` to include real estate market info in pretty responses.
-- `X-Debug`: Set to `true` to include source and timing details for troubleshooting.
-
-The `sports` option is still available as a query parameter when you want area-code sports team data.
+- `phone`: Required phone number to look up.
+- `mode`: `Basic` or `DeepResearch`.
+- `display`: `json` or `pretty`.
+- `realestate`: Set to `true` to include real estate market info in pretty responses.
+- `sports`: Set to `true` to include area-code sports team data.
 
 ## Response
 

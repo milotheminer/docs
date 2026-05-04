@@ -34,8 +34,7 @@
           {
             "group": "Lookup",
             "pages": [
-              "api-reference/endpoint/lookup",
-              "api-reference/endpoint/summary"
+              "api-reference/endpoint/lookup"
             ]
           }
         ]

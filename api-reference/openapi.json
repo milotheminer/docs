@@ -21,12 +21,12 @@
       "get": {
         "tags": ["Lookup"],
         "summary": "Lookup a phone number",
-        "description": "Returns caller context for a US phone number. The default response is JSON; use the `X-Display: pretty` header for a human-readable text response.",
+        "description": "Returns caller context for a US phone number. The default response is JSON; use `display=pretty` for a human-readable text response.",
         "operationId": "lookupPhoneNumber",
         "parameters": [
           {
-            "name": "X-Phone",
-            "in": "header",
+            "name": "phone",
+            "in": "query",
             "required": true,
             "description": "US phone number to look up. Formatting characters are accepted.",
             "schema": {
@@ -35,8 +35,8 @@
             }
           },
           {
-            "name": "X-Lookup-Mode",
-            "in": "header",
+            "name": "mode",
+            "in": "query",
             "required": false,
             "description": "Lookup depth. Basic aliases include `basic` and `B`; Deep Research aliases include `deepresearch`, `D`, and `DR`.",
             "schema": {
@@ -46,8 +46,8 @@
             }
           },
           {
-            "name": "X-Display",
-            "in": "header",
+            "name": "display",
+            "in": "query",
             "required": false,
             "description": "Response format.",
             "schema": {
@@ -57,33 +57,13 @@
             }
           },
           {
-            "name": "X-Debug",
-            "in": "header",
-            "required": false,
-            "description": "Include source, timing, and troubleshooting details.",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "X-RealEstate",
-            "in": "header",
+            "name": "realestate",
+            "in": "query",
             "required": false,
             "description": "Include real estate market info in pretty responses.",
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "X-Cache",
-            "in": "header",
-            "required": false,
-            "description": "Use cached lookup data when available. Set to `false` to force a fresh lookup.",
-            "schema": {
-              "type": "boolean",
-              "default": true
             }
           },
           {
@@ -108,7 +88,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Lookup result. JSON is returned by default; plain text is returned when `X-Display: pretty`.",
+            "description": "Lookup result. JSON is returned by default; plain text is returned when `display=pretty`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -122,7 +102,6 @@
                         "timestamp": "2026-05-03T00:00:00Z",
                         "elapsedMs": 842,
                         "mode": "Basic",
-                        "cache": true,
                         "credits": {
                           "charged": 1,
                           "remaining": 99,
@@ -181,90 +160,6 @@
           }
         }
       }
-    },
-    "/lookup/summary": {
-      "post": {
-        "tags": ["Lookup"],
-        "summary": "Generate a lookup summary",
-        "description": "Generates a short caller summary from lookup data already returned by `GET /lookup`.",
-        "operationId": "generateLookupSummary",
-        "parameters": [
-          {
-            "name": "X-API-Key",
-            "in": "header",
-            "required": true,
-            "description": "Your provided CallHeater API key.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LookupSummaryRequest"
-              },
-              "examples": {
-                "summaryRequest": {
-                  "summary": "Create a short caller summary",
-                  "value": {
-                    "lookupData": {
-                      "phone": {
-                        "e164": "+14155550123"
-                      },
-                      "identity": {
-                        "name": "Example Caller"
-                      },
-                      "line": {
-                        "type": "mobile",
-                        "carrier": "Example Wireless"
-                      }
-                    },
-                    "selectedName": "Example Caller"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Generated summary.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LookupSummaryResponse"
-                },
-                "example": {
-                  "text": "This number appears to belong to Example Caller and is associated with a mobile line on Example Wireless.",
-                  "model": "gemini-2.0-flash"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "502": {
-            "description": "Summary generation failed.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -310,11 +205,6 @@
           },
           "disclaimer": {
             "type": "string"
-          },
-          "debug": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Debug details when enabled for troubleshooting."
           }
         }
       },
@@ -331,9 +221,6 @@
           },
           "mode": {
             "type": "string"
-          },
-          "cache": {
-            "type": "boolean"
           },
           "credits": {
             "$ref": "#/components/schemas/Credits"
@@ -373,35 +260,6 @@
           },
           "bypassed": {
             "type": "boolean"
-          }
-        }
-      },
-      "LookupSummaryRequest": {
-        "type": "object",
-        "required": ["lookupData"],
-        "properties": {
-          "lookupData": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Lookup data returned by `GET /lookup`."
-          },
-          "selectedName": {
-            "type": ["string", "null"],
-            "description": "Optional display name to emphasize in the summary."
-          }
-        }
-      },
-      "LookupSummaryResponse": {
-        "type": "object",
-        "required": ["text", "model"],
-        "properties": {
-          "text": {
-            "type": "string",
-            "description": "Short generated caller summary."
-          },
-          "model": {
-            "type": "string",
-            "description": "Model used for summary generation."
           }
         }
       },

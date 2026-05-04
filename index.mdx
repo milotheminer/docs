@@ -24,13 +24,6 @@ CallHeater helps you look up a phone number and return caller context in a predi
   >
     Query a US phone number and get structured JSON or a human-readable text response.
   </Card>
-  <Card
-    title="Lookup summaries"
-    icon="sparkles"
-    href="/api-reference/endpoint/summary"
-  >
-    Generate a short caller summary from lookup data returned by the API.
-  </Card>
 </CardGroup>
 
 ## Authentication
@@ -38,9 +31,8 @@ CallHeater helps you look up a phone number and return caller context in a predi
 Include your provided API key in the `X-API-Key` header on each lookup request.
 
 ```bash
-curl "https://api.callheater.com/lookup" \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "X-Phone: 4155550123"
+curl "https://api.callheater.com/lookup?phone=4155550123" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 <Note>

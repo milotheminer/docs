@@ -24,9 +24,8 @@ https://api.callheater.com
 Send your provided API key in the `X-API-Key` header.
 
 ```bash
-curl "https://api.callheater.com/lookup" \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "X-Phone: 4155550123"
+curl "https://api.callheater.com/lookup?phone=4155550123" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ## Endpoints
@@ -34,9 +33,6 @@ curl "https://api.callheater.com/lookup" \
 <CardGroup cols={2}>
   <Card title="Lookup a phone number" icon="phone" href="/api-reference/endpoint/lookup">
     Return caller context for a phone number.
-  </Card>
-  <Card title="Generate a summary" icon="sparkles" href="/api-reference/endpoint/summary">
-    Generate a short summary from lookup response data.
   </Card>
 </CardGroup>
 
