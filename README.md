@@ -4,8 +4,7 @@ Customer-facing documentation for the CallHeater API.
 
 ## Contents
 
-- `index.mdx`: API overview.
-- `quickstart.mdx`: First phone lookup request.
+- `api-reference/introduction.mdx`: API overview.
 - `api-reference/openapi.json`: Customer-facing OpenAPI specification.
 - `api-reference/endpoint/`: Generated reference pages for lookup endpoints.
 

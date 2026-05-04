@@ -17,18 +17,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Get started",
-            "pages": [
-              "index",
-              "quickstart"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "API reference",
         "groups": [
           {
