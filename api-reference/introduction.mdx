@@ -1,33 +1,44 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Customer-facing reference for CallHeater lookup endpoints.'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+The CallHeater API accepts phone lookup requests and returns caller context as JSON or plain text.
 
-## Welcome
+## Base URL
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+```text
+https://api.callheater.com
+```
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="OpenAPI Specification"
+  icon="file-code"
+  href="/api-reference/openapi.json"
 >
-  View the OpenAPI specification file
+  View the customer-facing OpenAPI file.
 </Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Send your provided API key in the `X-API-Key` header.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+curl "https://api.callheater.com/lookup?phone=4155550123" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Lookup a phone number" icon="phone" href="/api-reference/endpoint/lookup">
+    Return caller context for a phone number.
+  </Card>
+  <Card title="Generate a summary" icon="sparkles" href="/api-reference/endpoint/summary">
+    Generate a short summary from lookup response data.
+  </Card>
+</CardGroup>
+
+<Note>
+  The API may return incomplete or delayed data depending on source availability.
+</Note>

@@ -1,123 +1,273 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "CallHeater API",
+    "description": "Customer-facing API for looking up phone number caller context.",
+    "version": "1.1.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.callheater.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:8800",
+      "description": "Local development"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "ApiKeyAuth": []
     }
   ],
   "paths": {
-    "/plants": {
+    "/lookup": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "tags": ["Lookup"],
+        "summary": "Lookup a phone number",
+        "description": "Returns caller context for a US phone number. The default response is JSON; use `display=pretty` for a human-readable text response.",
+        "operationId": "lookupPhoneNumber",
         "parameters": [
           {
-            "name": "limit",
+            "name": "phone",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "required": true,
+            "description": "US phone number to look up. Formatting characters are accepted.",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "examples": ["4155550123", "+14155550123"]
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "Lookup depth. Basic aliases include `basic` and `B`; Deep Research aliases include `deepresearch`, `D`, and `DR`.",
+            "schema": {
+              "type": "string",
+              "default": "Basic",
+              "enum": ["Basic", "DeepResearch"]
+            }
+          },
+          {
+            "name": "display",
+            "in": "query",
+            "required": false,
+            "description": "Response format.",
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json", "pretty"]
+            }
+          },
+          {
+            "name": "force_cnam",
+            "in": "query",
+            "required": false,
+            "description": "Force a CNAM/name lookup even when messaging availability is not detected.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sports",
+            "in": "query",
+            "required": false,
+            "description": "Include local sports team information for the phone number area code when available.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "description": "Enable caller name lookup. Set to `false` to skip name lookup.",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "match_name",
+            "in": "query",
+            "required": false,
+            "description": "Optional name to compare against the caller name result.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cache",
+            "in": "query",
+            "required": false,
+            "description": "Use cached lookup data when available. Set to `false` to force a fresh lookup.",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": true,
+            "description": "Your provided CallHeater API key.",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Lookup result. JSON is returned by default; plain text is returned when `display=pretty`.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/LookupResponse"
+                },
+                "examples": {
+                  "basic": {
+                    "summary": "Basic JSON response",
+                    "value": {
+                      "meta": {
+                        "timestamp": "2026-05-03T00:00:00Z",
+                        "elapsedMs": 842,
+                        "mode": "Basic",
+                        "cache": true,
+                        "credits": {
+                          "charged": 1,
+                          "remaining": 99,
+                          "bypassed": false
+                        }
+                      },
+                      "query": {
+                        "phone": "+14155550123"
+                      },
+                      "phone": {
+                        "e164": "+14155550123",
+                        "national": "(415) 555-0123",
+                        "country": "US",
+                        "areaCode": "415"
+                      },
+                      "identity": {
+                        "name": "Example Caller",
+                        "gender": null,
+                        "match": null
+                      },
+                      "line": {
+                        "type": "mobile",
+                        "carrier": "Example Wireless"
+                      },
+                      "availability": {
+                        "imessage": null,
+                        "whatsapp": null
+                      },
+                      "disclaimer": "For informational purposes only. Data may be incomplete, delayed, or inaccurate. Do not use it as the sole basis for personal, legal, financial, or safety decisions."
+                    }
                   }
                 }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "CallHeater Lookup\nPhone: +14155550123\nName: Example Caller\nCarrier: Example Wireless"
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
+          "402": {
+            "$ref": "#/components/responses/InsufficientCredits"
           },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/lookup/summary": {
+      "post": {
+        "tags": ["Lookup"],
+        "summary": "Generate a lookup summary",
+        "description": "Generates a short caller summary from lookup data already returned by `GET /lookup`.",
+        "operationId": "generateLookupSummary",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "name": "X-API-Key",
+            "in": "header",
             "required": true,
+            "description": "Your provided CallHeater API key.",
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupSummaryRequest"
+              },
+              "examples": {
+                "summaryRequest": {
+                  "summary": "Create a short caller summary",
+                  "value": {
+                    "lookupData": {
+                      "phone": {
+                        "e164": "+14155550123"
+                      },
+                      "identity": {
+                        "name": "Example Caller"
+                      },
+                      "line": {
+                        "type": "mobile",
+                        "carrier": "Example Wireless"
+                      }
+                    },
+                    "selectedName": "Example Caller"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Generated summary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupSummaryResponse"
+                },
+                "example": {
+                  "text": "This number appears to belong to Example Caller and is associated with a mobile line on Example Wireless.",
+                  "model": "gemini-2.0-flash"
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "description": "Summary generation failed.",
             "content": {
               "application/json": {
                 "schema": {
@@ -125,92 +275,240 @@
                 }
               }
             }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Send your provided API key in the `X-API-Key` header."
+      }
+    },
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "LookupResponse": {
         "type": "object",
+        "description": "Structured lookup response. Available fields vary by lookup mode and source availability.",
+        "additionalProperties": true,
         "properties": {
-          "name": {
-            "description": "The name of the plant",
+          "meta": {
+            "$ref": "#/components/schemas/LookupMeta"
+          },
+          "query": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The normalized request inputs."
+          },
+          "phone": {
+            "$ref": "#/components/schemas/PhoneDetails"
+          },
+          "identity": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Caller identity signals when available."
+          },
+          "line": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Carrier and line type signals when available."
+          },
+          "availability": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Messaging or service availability signals when available."
+          },
+          "disclaimer": {
             "type": "string"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "debug": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Debug details when enabled for troubleshooting."
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "LookupMeta": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
           },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
+          "elapsedMs": {
+            "type": "integer"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "cache": {
+            "type": "boolean"
+          },
+          "credits": {
+            "$ref": "#/components/schemas/Credits"
           }
-        ]
+        }
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "PhoneDetails": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "e164": {
+            "type": "string",
+            "example": "+14155550123"
+          },
+          "national": {
+            "type": "string",
+            "example": "(415) 555-0123"
+          },
+          "country": {
+            "type": "string",
+            "example": "US"
+          },
+          "areaCode": {
+            "type": "string",
+            "example": "415"
+          }
+        }
+      },
+      "Credits": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "charged": {
+            "type": "number"
           },
-          "message": {
-            "type": "string"
+          "remaining": {
+            "type": "number"
+          },
+          "bypassed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LookupSummaryRequest": {
+        "type": "object",
+        "required": ["lookupData"],
+        "properties": {
+          "lookupData": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Lookup data returned by `GET /lookup`."
+          },
+          "selectedName": {
+            "type": ["string", "null"],
+            "description": "Optional display name to emphasize in the summary."
+          }
+        }
+      },
+      "LookupSummaryResponse": {
+        "type": "object",
+        "required": ["text", "model"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Short generated caller summary."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model used for summary generation."
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "detail": {
+            "description": "Error details.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            ]
           }
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    "responses": {
+      "BadRequest": {
+        "description": "The request was invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "The request is missing a valid API key or is not allowed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "InsufficientCredits": {
+        "description": "The account does not have enough credits for this lookup.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "detail": {
+                "message": "Not enough credits for this lookup",
+                "remainingCredits": 0,
+                "requiredCredits": 1
+              }
+            }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Too many requests. Retry after the number of seconds in the `Retry-After` header.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Unexpected server error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     }
   }
