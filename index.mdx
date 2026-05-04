@@ -38,8 +38,9 @@ CallHeater helps you look up a phone number and return caller context in a predi
 Include your provided API key in the `X-API-Key` header on each lookup request.
 
 ```bash
-curl "https://api.callheater.com/lookup?phone=4155550123" \
-  -H "X-API-Key: YOUR_API_KEY"
+curl "https://api.callheater.com/lookup" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "X-Phone: 4155550123"
 ```
 
 <Note>

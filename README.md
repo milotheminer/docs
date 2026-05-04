@@ -25,4 +25,4 @@ Run the following command at the root of your documentation, where your `docs.js
 mint dev
 ```
 
-View your local preview at `http://localhost:3000`.
+Open the preview URL printed by the Mintlify CLI.

@@ -9,10 +9,6 @@
     {
       "url": "https://api.callheater.com",
       "description": "Production"
-    },
-    {
-      "url": "http://localhost:8800",
-      "description": "Local development"
     }
   ],
   "security": [
@@ -25,12 +21,12 @@
       "get": {
         "tags": ["Lookup"],
         "summary": "Lookup a phone number",
-        "description": "Returns caller context for a US phone number. The default response is JSON; use `display=pretty` for a human-readable text response.",
+        "description": "Returns caller context for a US phone number. The default response is JSON; use the `X-Display: pretty` header for a human-readable text response.",
         "operationId": "lookupPhoneNumber",
         "parameters": [
           {
-            "name": "phone",
-            "in": "query",
+            "name": "X-Phone",
+            "in": "header",
             "required": true,
             "description": "US phone number to look up. Formatting characters are accepted.",
             "schema": {
@@ -39,8 +35,8 @@
             }
           },
           {
-            "name": "mode",
-            "in": "query",
+            "name": "X-Lookup-Mode",
+            "in": "header",
             "required": false,
             "description": "Lookup depth. Basic aliases include `basic` and `B`; Deep Research aliases include `deepresearch`, `D`, and `DR`.",
             "schema": {
@@ -50,8 +46,8 @@
             }
           },
           {
-            "name": "display",
-            "in": "query",
+            "name": "X-Display",
+            "in": "header",
             "required": false,
             "description": "Response format.",
             "schema": {
@@ -61,13 +57,33 @@
             }
           },
           {
-            "name": "force_cnam",
-            "in": "query",
+            "name": "X-Debug",
+            "in": "header",
             "required": false,
-            "description": "Force a CNAM/name lookup even when messaging availability is not detected.",
+            "description": "Include source, timing, and troubleshooting details.",
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "X-RealEstate",
+            "in": "header",
+            "required": false,
+            "description": "Include real estate market info in pretty responses.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "X-Cache",
+            "in": "header",
+            "required": false,
+            "description": "Use cached lookup data when available. Set to `false` to force a fresh lookup.",
+            "schema": {
+              "type": "boolean",
+              "default": true
             }
           },
           {
@@ -78,35 +94,6 @@
             "schema": {
               "type": "boolean",
               "default": false
-            }
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "required": false,
-            "description": "Enable caller name lookup. Set to `false` to skip name lookup.",
-            "schema": {
-              "type": "boolean",
-              "default": true
-            }
-          },
-          {
-            "name": "match_name",
-            "in": "query",
-            "required": false,
-            "description": "Optional name to compare against the caller name result.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "cache",
-            "in": "query",
-            "required": false,
-            "description": "Use cached lookup data when available. Set to `false` to force a fresh lookup.",
-            "schema": {
-              "type": "boolean",
-              "default": true
             }
           },
           {
@@ -121,7 +108,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Lookup result. JSON is returned by default; plain text is returned when `display=pretty`.",
+            "description": "Lookup result. JSON is returned by default; plain text is returned when `X-Display: pretty`.",
             "content": {
               "application/json": {
                 "schema": {
