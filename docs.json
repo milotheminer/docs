@@ -36,6 +36,13 @@
             "pages": [
               "api-reference/endpoint/lookup"
             ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api-reference/endpoint/health",
+              "api-reference/endpoint/credits"
+            ]
           }
         ]
       }

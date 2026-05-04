@@ -11,14 +11,6 @@ The CallHeater API accepts phone lookup requests and returns caller context as J
 https://api.callheater.com
 ```
 
-<Card
-  title="OpenAPI Specification"
-  icon="file-code"
-  href="/api-reference/openapi.json"
->
-  View the customer-facing OpenAPI file.
-</Card>
-
 ## Authentication
 
 Send your provided API key in the `X-API-Key` header.
@@ -33,6 +25,12 @@ curl "https://api.callheater.com/lookup?phone=4155550123" \
 <CardGroup cols={2}>
   <Card title="Lookup a phone number" icon="phone" href="/api-reference/endpoint/lookup">
     Return caller context for a phone number.
+  </Card>
+  <Card title="Check API health" icon="heartbeat" href="/api-reference/endpoint/health">
+    Confirm the API is online.
+  </Card>
+  <Card title="Check API key credits" icon="key" href="/api-reference/endpoint/credits">
+    Verify an API key and view its credit balance.
   </Card>
 </CardGroup>
 

@@ -17,6 +17,82 @@
     }
   ],
   "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Utilities"],
+        "summary": "Check API health",
+        "description": "Returns a simple status response when the API is online.",
+        "operationId": "checkHealth",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The API is online.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "example": {
+                  "status": "ok"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credits": {
+      "get": {
+        "tags": ["Utilities"],
+        "summary": "Check API key credits",
+        "description": "Verifies the provided API key and returns its remaining credit balance.",
+        "operationId": "checkApiKeyCredits",
+        "parameters": [
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": true,
+            "description": "Your provided CallHeater API key.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The API key is valid and credit details were returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditsResponse"
+                },
+                "example": {
+                  "user": {
+                    "id": "user_123",
+                    "phone": "+14155550123",
+                    "email": null
+                  },
+                  "credits": {
+                    "balance": 99,
+                    "source": "unkey"
+                  },
+                  "apiKeys": []
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
     "/lookup": {
       "get": {
         "tags": ["Lookup"],
@@ -172,6 +248,63 @@
       }
     },
     "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          }
+        }
+      },
+      "CreditsResponse": {
+        "type": "object",
+        "required": ["user", "credits", "apiKeys"],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "credits": {
+            "$ref": "#/components/schemas/CreditBalance"
+          },
+          "apiKeys": {
+            "type": "array",
+            "description": "API keys are only listed when the request is authenticated with a bearer token.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "phone": {
+            "type": ["string", "null"]
+          },
+          "email": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "CreditBalance": {
+        "type": "object",
+        "required": ["balance", "source"],
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
       "LookupResponse": {
         "type": "object",
         "description": "Structured lookup response. Available fields vary by lookup mode and source availability.",
